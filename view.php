@@ -74,13 +74,20 @@ if ($urlparams['action'] == 'grader' && $urlparams['status'] !== '') {
 $PAGE->set_url($url);
 
 if ($urlparams['action'] == '') {
-    show_details($context, $coursemoduleid);
+    mod_externalassignment_show_details($context, $coursemoduleid);
 } else if ($urlparams['action'] == 'grading') {
-    show_grading($context, $coursemoduleid, $urlparams['sort'], $urlparams['tdir']);
+    mod_externalassignment_show_grading($context, $coursemoduleid, $urlparams['sort'], $urlparams['tdir']);
 } else if ($urlparams['action'] == 'grader') {
-    show_grader($context, $coursemoduleid, $urlparams['userid'], $urlparams['sort'], $urlparams['tdir'], $urlparams['status']);
+    mod_externalassignment_show_grader(
+        $context,
+        $coursemoduleid,
+        $urlparams['userid'],
+        $urlparams['sort'],
+        $urlparams['tdir'],
+        $urlparams['status']
+    );
 } else if ($urlparams['action'] == 'override') {
-    show_override($context, $coursemoduleid, $urlparams['userids']);
+    mod_externalassignment_show_override($context, $coursemoduleid, $urlparams['userids']);
 }
 
 /**
@@ -91,7 +98,7 @@ if ($urlparams['action'] == '') {
  * @throws \coding_exception
  * @throws \dml_exception
  */
-function show_details($context, $coursemoduleid): void {
+function mod_externalassignment_show_details($context, $coursemoduleid): void {
     global $PAGE, $USER;
 
     $courseshortname = $context->get_course_context()->get_context_name(false, true);
@@ -149,7 +156,7 @@ function show_details($context, $coursemoduleid): void {
  * @throws \coding_exception
  * @throws \required_capability_exception
  */
-function show_grading(
+function mod_externalassignment_show_grading(
     context $context,
     int $coursemoduleid,
     string $sort,
@@ -189,7 +196,7 @@ function show_grading(
  * @throws \dml_exception
  * @throws \moodle_exception
  */
-function show_grader($context, $coursemoduleid, $userid, string $sort, string $tdir, string $status): void {
+function mod_externalassignment_show_grader($context, $coursemoduleid, $userid, string $sort, string $tdir, string $status): void {
     global $PAGE;
     require_capability('mod/externalassignment:reviewgrades', $context);
 
@@ -241,7 +248,7 @@ function show_grader($context, $coursemoduleid, $userid, string $sort, string $t
  * @throws dml_exception
  * @throws moodle_exception
  */
-function show_override($context, int $coursemoduleid, array $userids): void {
+function mod_externalassignment_show_override($context, int $coursemoduleid, array $userids): void {
     global $CFG;
     global $PAGE;
 

@@ -28,7 +28,7 @@
 /**
  * Custom uninstallation procedure.
  */
-function xmldb_mod_externalassignment_uninstall() {
+function xmldb_externalassignment_uninstall() {
 
     return true;
 }
