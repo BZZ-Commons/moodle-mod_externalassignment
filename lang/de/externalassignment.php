@@ -40,6 +40,7 @@ $string['assignmentname'] = 'Name der Aufgabe';
 $string['availability'] = 'Verfügbarkeit';
 
 $string['changeuser'] = 'Nutzer wechseln';
+$string['chooseoperation'] = 'Aktion wählen';
 $string['completiongradesgroup'] = 'Gruppe für Abschlussbedingungen';
 $string['completiongradesgroup_help'] = 'Regeln für den automatischen Abschluss, basierend auf den erreichten Bewertungen';
 $string['configintro'] = 'Die hier festgelegten Werte werden vom Plugin "External Assignment" verwendet';
@@ -68,6 +69,7 @@ $string['externalassignment:reviewgrades'] = 'Bewertungen für externe Aufgabe �
 $string['externalassignment:submit'] = 'Externe Aufgabe abgeben';
 $string['externalassignment:view'] = 'Externe Aufgabe ansehen';
 $string['externalassignment:viewgrades'] = 'Bewertungen für externe Aufgabe ansehen';
+$string['externalassignmentdetails'] = 'Details der externen Aufgabe';
 $string['externalfeedback'] = 'Rückmeldung vom externen System';
 $string['externalgrade'] = 'Externe Bewertung';
 $string['externalgrademax'] = 'Externe Bewertung max.';
@@ -86,6 +88,7 @@ $string['feedback'] = 'Rückmeldung';
 $string['finalgrade'] = 'Endbewertung';
 $string['findduplicates'] = 'Aufgaben mit doppeltem externem Namen suchen';
 
+$string['go'] = 'Los';
 $string['grade'] = 'Bewertung';
 $string['gradecomponent'] = 'Bewertungskomponente';
 $string['graded'] = 'Bewertet';
@@ -96,6 +99,7 @@ $string['grantextension'] = 'Fristverlängerung gewähren';
 
 $string['isdue'] = 'ist fällig';
 
+$string['lastmodified'] = 'Zuletzt geändert';
 $string['mandatory'] = 'Erforderlich';
 $string['manual'] = 'Manuell';
 $string['manualfeedback'] = 'Manuelle Rückmeldung';
@@ -161,3 +165,4 @@ $string['timeremainingcolon'] = 'Verbleibende Zeit: {$a}';
 $string['totalgrade'] = 'Gesamtpunktzahl';
 
 $string['view'] = 'Ansehen';
+$string['withselected'] = 'Mit Auswahl ...';

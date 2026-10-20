@@ -40,6 +40,7 @@ $string['assignmentname'] = 'Assignment name';
 $string['availability'] = 'Availability';
 
 $string['changeuser'] = 'Change user';
+$string['chooseoperation'] = 'Choose operation';
 $string['completiongradesgroup'] = 'Completion grades group';
 $string['completiongradesgroup_help'] = 'Rules for automatic completion, based on the grades';
 $string['configintro'] = 'The values set here are used by the "External assignment" plugin';
@@ -68,6 +69,7 @@ $string['externalassignment:reviewgrades'] = 'Review grades for external assignm
 $string['externalassignment:submit'] = 'Submit external assignment';
 $string['externalassignment:view'] = 'View external assignment';
 $string['externalassignment:viewgrades'] = 'View grades for external assignment';
+$string['externalassignmentdetails'] = 'External assignment details';
 $string['externalfeedback'] = 'Feedback from external system';
 $string['externalgrade'] = 'External grade';
 $string['externalgrademax'] = 'External grade max.';
@@ -86,6 +88,7 @@ $string['feedback'] = 'Feedback';
 $string['finalgrade'] = 'Final grade';
 $string['findduplicates'] = 'Find assignments with duplicate external names';
 
+$string['go'] = 'Go';
 $string['grade'] = 'Grade';
 $string['gradecomponent'] = 'Grading component';
 $string['graded'] = 'Graded';
@@ -96,6 +99,7 @@ $string['grantextension'] = 'Grant extension';
 
 $string['isdue'] = 'is due';
 
+$string['lastmodified'] = 'Last modified';
 $string['mandatory'] = 'Mandatory';
 $string['manual'] = 'Manual';
 $string['manualfeedback'] = 'Manual feedback';
@@ -161,3 +165,4 @@ $string['timeremainingcolon'] = 'Time remaining: {$a}';
 $string['totalgrade'] = 'Total points';
 
 $string['view'] = 'View';
+$string['withselected'] = 'With selected...';

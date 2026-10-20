@@ -100,7 +100,7 @@ function show_details($context, $coursemoduleid): void {
     $assignment->load_db($coursemoduleid);
     $title = $courseshortname . ': ' . $assignmentname;
     $PAGE->set_title($title);
-    $PAGE->set_heading('External assignment details');
+    $PAGE->set_heading(get_string('externalassignmentdetails', 'externalassignment'));
     // The "incourse" layout is what core needs to show the links to the previous/next
     // activity below the page (GitHub issue #10).
     $PAGE->set_pagelayout('incourse');
@@ -163,7 +163,7 @@ function show_grading(
     $title = $courseshortname . ': ' . $assignmentname . ' - ' .
         get_string('grading', 'externalassignment');
     $PAGE->set_title($title);
-    $PAGE->set_heading('Grading overview');
+    $PAGE->set_heading(get_string('gradingoverview', 'externalassignment'));
     $PAGE->set_secondary_active_tab('mod_externalassignment_submissions');
     // The "incourse" layout lets core show the previous/next activity links (GitHub issue #41).
     $PAGE->set_pagelayout('incourse');
@@ -215,7 +215,7 @@ function show_grader($context, $coursemoduleid, $userid, string $sort, string $t
     $assignmentname = $context->get_context_name(false, true);
     $title = $courseshortname . ': ' . $assignmentname . ' - ' . get_string('grade', 'externalassignment');
     $PAGE->set_title($title);
-    $PAGE->set_heading('Grader form');
+    $PAGE->set_heading(get_string('grade', 'externalassignment'));
     $PAGE->set_secondary_active_tab('mod_externalassignment_submissions');
     // The "incourse" layout lets core show the previous/next activity links (GitHub issue #41).
     $PAGE->set_pagelayout('incourse');
@@ -250,7 +250,7 @@ function show_override($context, int $coursemoduleid, array $userids): void {
     $assignmentname = $context->get_context_name(false, true);
     $title = $courseshortname . ': ' . $assignmentname . ' - ' . get_string('override', 'externalassignment');
     $PAGE->set_title($title);
-    $PAGE->set_heading('My modules page heading');
+    $PAGE->set_heading(get_string('override', 'externalassignment'));
     $PAGE->set_pagelayout('base');
     $PAGE->add_body_class('externalassignment-grading');
     $output = $PAGE->get_renderer('mod_externalassignment');
