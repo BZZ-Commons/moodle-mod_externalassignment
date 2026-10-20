@@ -54,7 +54,6 @@ $string['done'] = 'erledigt';
 $string['duedate'] = 'Abgabetermin';
 $string['duedate_help'] = 'Dies ist der Termin, an dem die Aufgabe fällig ist. Abgaben sind auch nach diesem Datum noch möglich. Legen Sie einen Abgabeschluss fest, um Abgaben nach einem bestimmten Datum zu verhindern.';
 $string['duedateaftersubmissionvalidation'] = 'Der Abgabetermin muss nach dem Datum "Abgabe erlauben ab" liegen.';
-$string['duedatevalidation'] = 'Der Abgabetermin darf nicht vor dem Datum "Abgabe erlauben ab" liegen.';
 $string['duplicatenamevalidation'] = 'In diesem Kurs existiert bereits eine Aufgabe mit diesem externen Namen. Bitte wählen Sie einen anderen Namen.';
 
 $string['extensiongranted'] = ' / Fristverlängerung gewährt: ';
@@ -86,7 +85,6 @@ $string['externalusername_desc'] = 'Das Benutzerprofilfeld, das den externen Ben
 
 $string['feedback'] = 'Rückmeldung';
 $string['finalgrade'] = 'Endbewertung';
-$string['findduplicates'] = 'Aufgaben mit doppeltem externem Namen suchen';
 
 $string['go'] = 'Los';
 $string['grade'] = 'Bewertung';
@@ -94,7 +92,6 @@ $string['gradecomponent'] = 'Bewertungskomponente';
 $string['graded'] = 'Bewertet';
 $string['grading'] = 'Bewertung';
 $string['gradingoverview'] = 'Bewertungsübersicht';
-$string['gradingstatus'] = 'Bewertungsstatus';
 $string['grantextension'] = 'Fristverlängerung gewähren';
 
 $string['isdue'] = 'ist fällig';
@@ -115,6 +112,7 @@ $string['needspassinggrade'] = 'Eine genügende Bewertung erreichen';
 $string['needspassinggradedesc'] = 'Studierende müssen eine genügende Bewertung erreichen, um die Aufgabe abzuschliessen';
 $string['nextuser'] = 'Nächster Nutzer';
 $string['noduedate'] = 'Kein Abgabetermin';
+$string['nooverridedata'] = 'Es wurden keine Änderungen an den Überschreibungsdaten vorgenommen.';
 $string['nostudents'] = 'Es gibt keine Studierenden zu bewerten.';
 $string['notsubmitted'] = 'nicht abgegeben';
 
@@ -148,11 +146,9 @@ $string['privacy:metadata:userid'] = 'Die Nutzer-ID der/des Studierenden';
 
 $string['scoremaximum'] = 'Maximale Punktzahl';
 $string['scorereached'] = 'Erreichte Punktzahl';
-$string['seefeedback'] = 'Rückmeldung ansehen';
 $string['selectedusers'] = 'Ausgewählte Nutzer';
 $string['statusfilter'] = 'Nach Status filtern';
 $string['studentlink'] = 'Ihre Aufgabe';
-$string['submissions'] = 'Abgaben';
 $string['submissionsdue'] = 'Fällig:';
 $string['submissionsopen'] = 'Öffnet:';
 $string['submissionsopened'] = 'Geöffnet:';
@@ -164,5 +160,4 @@ $string['timeremaining'] = 'Verbleibende Zeit';
 $string['timeremainingcolon'] = 'Verbleibende Zeit: {$a}';
 $string['totalgrade'] = 'Gesamtpunktzahl';
 
-$string['view'] = 'Ansehen';
 $string['withselected'] = 'Mit Auswahl ...';

@@ -54,7 +54,6 @@ $string['done'] = 'done';
 $string['duedate'] = 'Due date';
 $string['duedate_help'] = 'This is when the assignment is due. Submissions will still be allowed after this date. Set an assignment cut-off date to prevent submissions after a certain date.';
 $string['duedateaftersubmissionvalidation'] = 'Due date must be after the allow submissions from date.';
-$string['duedatevalidation'] = 'Due date cannot be earlier than the allow submissions from date.';
 $string['duplicatenamevalidation'] = 'An assignment with this external name already exists in this course. Please choose another name.';
 
 $string['extensiongranted'] = ' / Extension granted: ';
@@ -86,7 +85,6 @@ $string['externalusername_desc'] = 'The user profile field containing the extern
 
 $string['feedback'] = 'Feedback';
 $string['finalgrade'] = 'Final grade';
-$string['findduplicates'] = 'Find assignments with duplicate external names';
 
 $string['go'] = 'Go';
 $string['grade'] = 'Grade';
@@ -94,7 +92,6 @@ $string['gradecomponent'] = 'Grading component';
 $string['graded'] = 'Graded';
 $string['grading'] = 'Grading';
 $string['gradingoverview'] = 'Grading overview';
-$string['gradingstatus'] = 'Grading status';
 $string['grantextension'] = 'Grant extension';
 
 $string['isdue'] = 'is due';
@@ -115,6 +112,7 @@ $string['needspassinggrade'] = 'Receive a passing grade';
 $string['needspassinggradedesc'] = 'Student needs a passing grade to complete the assignment';
 $string['nextuser'] = 'Next user';
 $string['noduedate'] = 'No due date';
+$string['nooverridedata'] = 'No changes were made to the override data.';
 $string['nostudents'] = 'There are no students to grade.';
 $string['notsubmitted'] = 'not submitted';
 
@@ -148,11 +146,9 @@ $string['privacy:metadata:userid'] = 'The user ID identifying the student';
 
 $string['scoremaximum'] = 'Maximum points';
 $string['scorereached'] = 'Points earned';
-$string['seefeedback'] = 'See feedback';
 $string['selectedusers'] = 'Selected users';
 $string['statusfilter'] = 'Filter by status';
 $string['studentlink'] = 'Your assignment';
-$string['submissions'] = 'Submissions';
 $string['submissionsdue'] = 'Due:';
 $string['submissionsopen'] = 'Opens:';
 $string['submissionsopened'] = 'Opened:';
@@ -164,5 +160,4 @@ $string['timeremaining'] = 'Time left';
 $string['timeremainingcolon'] = 'Time remaining: {$a}';
 $string['totalgrade'] = 'Total points';
 
-$string['view'] = 'View';
 $string['withselected'] = 'With selected...';
