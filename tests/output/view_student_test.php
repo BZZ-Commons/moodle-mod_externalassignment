@@ -295,4 +295,48 @@ final class view_student_test extends \advanced_testcase {
 
         $this->assertEquals(get_string('noduedate', 'externalassignment'), $data->timeremaining);
     }
+
+    /**
+     * Regression test for GitHub issue #50: the manual feedback is saved as raw HTML and the
+     * template prints it unescaped, so it must be cleaned before it is exported.
+     */
+    public function test_export_for_template_cleans_manual_feedback(): void {
+        global $PAGE, $DB;
+
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        $course = $this->getDataGenerator()->create_course();
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_externalassignment');
+        $instance = $generator->create_instance(['course' => $course->id]);
+
+        $student = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($student->id, $course->id, 'student');
+
+        $DB->insert_record('externalassignment_grades', (object)[
+            'externalassignment' => $instance->id,
+            'userid' => $student->id,
+            'grader' => 2,
+            'externallink' => 'https://example.com/repo',
+            'externalgrade' => 50,
+            'manualgrade' => 0,
+            'manualfeedback' => '<script>alert(1)</script><b onmouseover="alert(2)">well done</b>',
+        ]);
+
+        $module = get_coursemodule_from_instance('externalassignment', $instance->id);
+        $context = \context_module::instance($module->id);
+
+        $assign = new assign(null, $context);
+        $assign->load_db($module->id);
+
+        $grade = new grade(null);
+        $grade->load_db($assign->get_id(), $student->id);
+
+        $data = (new view_student($module->id, $context, $assign, $grade, $student->id))
+            ->export_for_template($PAGE->get_renderer('core'));
+
+        $this->assertStringNotContainsString('<script', $data->manualfeedback);
+        $this->assertStringNotContainsString('onmouseover', $data->manualfeedback);
+        $this->assertStringContainsString('well done', $data->manualfeedback);
+    }
 }

@@ -137,7 +137,11 @@ class view_student implements renderable, templatable {
 
         $data->passingpercentage = number_format($this->assignment->get_passingpercentage(), 2);
         $data->externalfeedback = format_text($this->grade->get_externalfeedback(), FORMAT_MARKDOWN);
-        $data->manualfeedback = $this->grade->get_manualfeedback();
+        $data->manualfeedback = format_text(
+            $this->grade->get_manualfeedback(),
+            FORMAT_HTML,
+            ['context' => $this->context]
+        );
         return $data;
     }
 }
