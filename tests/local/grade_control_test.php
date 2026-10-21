@@ -43,6 +43,7 @@ use PHPUnit\Framework\Attributes\Group;
 #[CoversMethod(grade_control::class, 'override_update')]
 #[CoversMethod(grade_control::class, 'get_next_student_id')]
 #[CoversMethod(grade_control::class, 'grader_url')]
+#[CoversMethod(grade_control::class, 'filter_student_userids')]
 final class grade_control_test extends \advanced_testcase {
     /**
      * Test constructor
@@ -353,5 +354,27 @@ final class grade_control_test extends \advanced_testcase {
         $this->assertEquals('grade', $url->get_param('sort'));
         $this->assertEquals('desc', $url->get_param('tdir'));
         $this->assertEquals('open', $url->get_param('status'));
+    }
+
+    /**
+     * User ids that are not students of the assignment (e.g. tampered form data) are dropped.
+     */
+    public function test_filter_student_userids_drops_non_students(): void {
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+        $course = $this->getDataGenerator()->create_course();
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_externalassignment');
+        $instance = $generator->create_instance(['course' => $course->id]);
+        $context = \context_module::instance($instance->cmid);
+        $student = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($student->id, $course->id, 'student');
+        $outsider = $this->getDataGenerator()->create_user();
+
+        $gradecontrol = new grade_control($instance->cmid, $context, $student->id, 'lastname', 'asc', '');
+
+        $this->assertSame(
+            [(int)$student->id],
+            $gradecontrol->filter_student_userids([$student->id, $outsider->id, 999999])
+        );
     }
 }

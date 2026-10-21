@@ -147,10 +147,8 @@ class grade_control {
 
         $grade = $student->get_grade();
         if (!empty($student->get_grade())) {
-            $data->gradeid = $grade->get_id();
             $data->externallink = $grade->get_externallink();
         } else {
-            $data->gradeid = -1;
             $data->externallink = '';
         }
         $data->externalassignment = $this->get_assign()->get_id();
@@ -186,6 +184,11 @@ class grade_control {
         } else {
             if ($formdata = $mform->get_data()) {
                 global $DB;
+                // The student and the assignment come from the request URL and the server, not from the form.
+                $formdata->userid = $this->get_userid();
+                $formdata->externalassignmentid = $this->get_assign()->get_id();
+                $formdata->gradeid = $student->get_grade()?->get_id() ?? -1;
+                $formdata->externallink = $student->get_grade()?->get_externallink() ?? '';
                 $grade = new grade($formdata);
                 if ($grade->get_id() == - 1) {
                     $grade->set_id($DB->insert_record('externalassignment_grades', $grade->to_stdclass()));
@@ -227,7 +230,6 @@ class grade_control {
                 if (array_key_exists($this->get_userid(), $this->get_assign()->get_students())) {
                     if (!empty($student->get_grade())) {
                         $grade = $student->get_grade();
-                        $data->gradeid = $grade->get_id();
                         $data->externalassignment = $grade->get_externalassignment();
                         $data->status = $student->get_status();
                         $data->externalgrade = $grade->get_externalgrade();
@@ -243,6 +245,22 @@ class grade_control {
                 $mform->display();
             }
         }
+    }
+
+    /**
+     * keeps only the user ids that belong to students of this assignment
+     * @param array $userids the user ids, e.g. as submitted by the override form
+     * @return int[] the ids that are students of this assignment
+     */
+    public function filter_student_userids(array $userids): array {
+        $students = $this->get_assign()->get_students();
+        $result = [];
+        foreach ($userids as $userid) {
+            if (array_key_exists($userid, $students)) {
+                $result[] = (int)$userid;
+            }
+        }
+        return $result;
     }
 
     /**
@@ -263,23 +281,21 @@ class grade_control {
         $data->duedate = $this->get_assign()->get_duedate();
         $data->cutoffdate = $this->get_assign()->get_cutoffdate();
         $data->users = [];
-        foreach ($userids as $userid) {
-            if (array_key_exists($userid, $this->get_assign()->get_students())) {
-                $student = $this->get_assign()->get_students()[$userid];
-                $data->users[] = $student;
-            }
+        $students = $this->get_assign()->get_students();
+        foreach ($this->filter_student_userids($userids) as $userid) {
+            $data->users[] = $students[$userid];
         }
 
         // Form processing and displaying is done here.
-        $url = new \moodle_url('/mod/externalassignment/view.php', ['action' => 'override']);
+        $url = new \moodle_url('/mod/externalassignment/view.php', ['id' => $this->coursemoduleid, 'action' => 'override']);
         $mform = new override_form($url->out(false), $this->get_assign(), $data);
         if ($mform->is_cancelled()) {
             debugging('Cancelled');  // FIXME reset the form.
         } else {
             if ($formdata = $mform->get_data()) {
-                foreach ($formdata->uid as $userid) {
+                foreach ($this->filter_student_userids($formdata->uid) as $userid) {
                     $override = new override();
-                    $override->set_externalassignment($formdata->externalassignment);
+                    $override->set_externalassignment($this->get_assign()->get_id());
                     $override->set_userid($userid);
                     $override->set_allowfromdate($formdata->allowsubmissionsfromdate);
                     $override->set_duedate($formdata->duedate);
@@ -289,7 +305,7 @@ class grade_control {
                 $url = new \moodle_url(
                     '/mod/externalassignment/view.php',
                     [
-                        'id' => $formdata->id,
+                        'id' => $this->coursemoduleid,
                         'action' => 'grading',
                     ]
                 );

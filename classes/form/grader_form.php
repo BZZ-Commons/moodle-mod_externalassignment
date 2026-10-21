@@ -102,21 +102,6 @@ class grader_form extends moodleform {
         $mform->addElement('editor', 'manualfeedback', get_string('feedback'));
         $mform->setType('manualfeedback', PARAM_RAW);
 
-        $mform->addElement('hidden', 'externalassignmentid', $this->_customdata->externalassignment);
-        $mform->setType('externalassignmentid', PARAM_INT);
-        $mform->addElement('hidden', 'courseid', $this->_customdata->courseid);
-        $mform->setType('courseid', PARAM_INT);
-        $mform->addElement('hidden', 'id', $this->_customdata->id);
-        $mform->setType('id', PARAM_INT);
-        $mform->addElement('hidden', 'userid', $this->_customdata->userid);
-        $mform->setType('userid', PARAM_INT);
-        $mform->addElement('hidden', 'gradeid', $this->_customdata->gradeid);
-        $mform->setType('gradeid', PARAM_INT);
-        $mform->addElement('hidden', 'action', 'grader');
-        $mform->setType('action', PARAM_ALPHA);
-        $mform->addElement('hidden', 'externallink', $this->_customdata->externallink);
-        $mform->setType('externallink', PARAM_ALPHA);
-
         $buttonarray = [];
         $buttonarray[] =& $mform->createElement('submit', 'submitbutton', get_string('savechanges'));
         if ($this->_customdata->hasnextstudent) {
