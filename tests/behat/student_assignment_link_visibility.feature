@@ -50,3 +50,17 @@ Feature: The external assignment link must be shown to students according to its
     And I log in as "student1"
     And I am on the "Not yet open link assignment" "externalassignment activity" page
     Then I should not see "https://www.example.com/not-yet-open"
+
+  @javascript
+  Scenario: The link is shown when "Always show link" is off and no submission start date is set
+    Given I am logged in as "teacher1"
+    And I turn editing mode on
+    And I add an externalassignment activity to course "Course 1" section "1" and I fill the form with:
+      | Assignment name     | No start date link assignment         |
+      | External assignment | m999-nostartdatelink                   |
+      | Assignment link     | https://www.example.com/no-start-date  |
+      | Always show link    | 0                                      |
+    When I log out
+    And I log in as "student1"
+    And I am on the "No start date link assignment" "externalassignment activity" page
+    Then I should see "https://www.example.com/no-start-date"

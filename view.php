@@ -129,7 +129,7 @@ function mod_externalassignment_show_details($context, $coursemoduleid): void {
 
     if (
         $assignment->is_alwaysshowlink() ||
-        ($assignment->get_allowsubmissionsfromdate() > 0 && $assignment->get_allowsubmissionsfromdate() <= time())
+        $assignment->get_allowsubmissionsfromdate() <= time()
     ) {
         $renderable = new view_link($coursemoduleid, $assignment);
         echo $output->render($renderable);

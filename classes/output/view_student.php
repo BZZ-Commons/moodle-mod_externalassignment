@@ -91,8 +91,8 @@ class view_student implements renderable, templatable {
         $data->studentlink = preg_match('#^https?://#i', $studentlink) ? $studentlink : '';
         $data->externallink = $this->assignment->get_externallink();
         $allowsubmissionsfromdate = $this->assignment->get_allowsubmissionsfromdate();
-        $data->showexternallink = $this->assignment->is_alwaysshowlink() ||
-            ($allowsubmissionsfromdate > 0 && $allowsubmissionsfromdate <= time());
+        // An unset start date (0) means submissions are open from the beginning.
+        $data->showexternallink = $this->assignment->is_alwaysshowlink() || $allowsubmissionsfromdate <= time();
         $timeremaining = $this->student->get_duedate() - time();
         if (empty($this->student->get_duedate())) {
             $due = get_string('noduedate', 'externalassignment');
