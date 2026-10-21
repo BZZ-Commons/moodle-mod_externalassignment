@@ -113,6 +113,12 @@ class update_grade extends external_api {
                 break;
             }
 
+            // The caller must be allowed to update grades in this assignment.
+            $cm = get_coursemodule_from_instance('externalassignment', $assignment->get_id(), 0, false, MUST_EXIST);
+            $context = \context_module::instance($cm->id);
+            self::validate_context($context);
+            require_capability('mod/externalassignment:updateexternalgrade', $context);
+
             // Check if the assignment is overdue.
             $students = $assignment->get_students();
             $override = null;
@@ -144,7 +150,7 @@ class update_grade extends external_api {
             }
 
             // Update the grade.
-            self::update_grades($assignment, $userid, $params);
+            self::update_grades($assignment, $cm, $userid, $params);
             $results = self::generate_warning(
                 $results,
                 'info',
@@ -300,12 +306,13 @@ class update_grade extends external_api {
      * updates the grade and the feedback for the external assignment
      *
      * @param assign $assignment  the assignment the grades belong to
+     * @param \stdClass $cm the course module of the assignment
      * @param int $userid the id of the user
      * @param array $params the parameters from the POST request
      * @return void
      * @throws dml_exception
      */
-    private static function update_grades(assign $assignment, int $userid, array $params): void {
+    private static function update_grades(assign $assignment, \stdClass $cm, int $userid, array $params): void {
         global $CFG, $DB;
         $grade = new grade(null);
         $grade->load_db($assignment->get_id(), $userid);
@@ -337,8 +344,7 @@ class update_grade extends external_api {
             $gradevalues
         );
 
-        $cm = get_coursemodule_from_instance('externalassignment', $assignment->get_id(), 0, false, MUST_EXIST);
-         [$course, $coursemodule] = get_course_and_cm_from_cmid($cm->id, 'externalassignment');
+        [$course, $coursemodule] = get_course_and_cm_from_cmid($cm->id, 'externalassignment');
         $completion = new \completion_info($course);
         // COMPLETION_UNKNOWN asks completion_info to recompute the state from the custom
         // completion rule, which only applies to automatic tracking - passing it while

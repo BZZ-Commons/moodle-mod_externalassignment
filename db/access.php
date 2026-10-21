@@ -94,6 +94,15 @@ $capabilities = [
         ],
         'clonepermissionsfrom' => 'moodle/grade:manage',
     ],
+    'mod/externalassignment:updateexternalgrade' => [
+        'riskbitmask' => RISK_PERSONAL,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => [
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW,
+        ],
+    ],
     'mod/externalassignment:grantextension' => [
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,

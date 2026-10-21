@@ -82,7 +82,61 @@ final class update_grade_test extends \advanced_testcase {
     }
 
     /**
-     * Regression test for GitHub issue #32 ("The grade is only updated if the user is a student
+     * Regression test for GitHub issue #42: a caller without
+     * mod/externalassignment:updateexternalgrade (e.g. a student) must not be able to set grades.
+     */
+    public function test_execute_requires_capability(): void {
+        global $DB;
+
+        $this->resetAfterTest(true);
+
+        set_config('external_username', 'github_user', 'mod_externalassignment');
+        $field = $DB->get_record('user_info_field', ['shortname' => 'github_user'], '*', MUST_EXIST);
+
+        $course = $this->getDataGenerator()->create_course();
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_externalassignment');
+        $instance = $generator->create_instance(
+            [
+                'course' => $course->id,
+                'externalname' => 'externalname',
+                'externalgrademax' => 100,
+                'cutoffdate' => time() + 3600,
+            ]
+        );
+
+        $student = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($student->id, $course->id, 'student');
+        $teacher = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($teacher->id, $course->id, 'editingteacher');
+
+        $DB->insert_record('user_info_data', [
+            'userid' => $student->id,
+            'fieldid' => $field->id,
+            'data' => 'octocat-cap',
+            'dataformat' => FORMAT_MOODLE,
+        ]);
+
+        // A student grading themselves is rejected and nothing is stored.
+        $this->setUser($student);
+        try {
+            update_grade::execute('externalname', 'octocat-cap', 100.0, 100.0, 'https://example.com/repo', '');
+            $this->fail('Expected required_capability_exception');
+        } catch (\required_capability_exception $e) {
+            $this->assertFalse($DB->record_exists('externalassignment_grades', ['userid' => $student->id]));
+        }
+
+        // A teacher is allowed.
+        $this->setUser($teacher);
+        $result = update_grade::execute('externalname', 'octocat-cap', 45.0, 100.0, 'https://example.com/repo', '');
+        $this->assertEquals('info', $result['type']);
+        $this->assertTrue($DB->record_exists('externalassignment_grades', [
+            'externalassignment' => $instance->id,
+            'userid' => $student->id,
+        ]));
+    }
+
+    /**
+     * Regression test for GitHub issue #32("The grade is only updated if the user is a student
      * but not a grader/teacher"): an update posted for a Moodle user who is a teacher/grader on the
      * course (i.e. has mod/externalassignment:grade) must be rejected instead of being recorded as
      * if they were the submitting student.

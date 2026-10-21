@@ -66,6 +66,7 @@ $string['externalassignment:managegrades'] = 'Manage grades for external assignm
 $string['externalassignment:override'] = 'Override external assignment';
 $string['externalassignment:reviewgrades'] = 'Review grades for external assignment';
 $string['externalassignment:submit'] = 'Submit external assignment';
+$string['externalassignment:updateexternalgrade'] = 'Update external grades through the web service';
 $string['externalassignment:view'] = 'View external assignment';
 $string['externalassignment:viewgrades'] = 'View grades for external assignment';
 $string['externalassignmentdetails'] = 'External assignment details';

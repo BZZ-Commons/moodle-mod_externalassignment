@@ -37,7 +37,10 @@ $functions = [
         'type' => 'write',
 
         // Whether the service is available for use in AJAX calls from the web.
-        'ajax' => true,
+        'ajax' => false,
+
+        // The capability the caller needs in the module context (checked in execute()).
+        'capabilities' => 'mod/externalassignment:updateexternalgrade',
 
         // An optional list of services where the function will be included.
         'services' => [],
