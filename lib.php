@@ -163,11 +163,36 @@ function externalassignment_supports($feature) {
             return true;
         case FEATURE_COMPLETION_HAS_RULES:
             return true;
+        case FEATURE_COMPLETION_TRACKS_VIEWS:
+            return true;
         case FEATURE_MOD_PURPOSE:
             return MOD_PURPOSE_ASSESSMENT;
         default:
             return null;
     }
+}
+
+/**
+ * Mark the activity as viewed: triggers the course_module_viewed event and updates the completion state
+ *
+ * @param stdClass $externalassignment the externalassignment record
+ * @param stdClass $course the course record
+ * @param stdClass $cm the course module record
+ * @param context_module $context the module context
+ * @return void
+ */
+function externalassignment_view($externalassignment, $course, $cm, $context) {
+    $event = \mod_externalassignment\event\course_module_viewed::create([
+        'objectid' => $externalassignment->id,
+        'context' => $context,
+    ]);
+    $event->add_record_snapshot('course', $course);
+    $event->add_record_snapshot('course_modules', $cm);
+    $event->add_record_snapshot('externalassignment', $externalassignment);
+    $event->trigger();
+
+    $completion = new completion_info($course);
+    $completion->set_module_viewed($cm);
 }
 
 /**

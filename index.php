@@ -35,6 +35,9 @@ $course = $DB->get_record('course', ['id' => $id], '*', MUST_EXIST);
 
 // Require that the user is logged into the course.
 require_course_login($course);
+\mod_externalassignment\event\course_module_instance_list_viewed::create([
+    'context' => context_course::instance($course->id),
+])->trigger();
 $PAGE->set_pagelayout('incourse');
 $PAGE->set_url('/mod/externalassignment/index.php', ['id' => $course->id]);
 $PAGE->set_title($course->shortname . ': ' . get_string('modulenameplural', 'externalassignment'));

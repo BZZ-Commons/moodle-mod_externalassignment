@@ -34,7 +34,7 @@ use mod_externalassignment\output\view_student;
 use mod_externalassignment\output\view_summary;
 
 require_once('../../config.php');
-global $PAGE;
+global $DB, $PAGE;
 
 $coursemoduleid = required_param('id', PARAM_INT);
 
@@ -74,6 +74,8 @@ if ($urlparams['action'] == 'grader' && $urlparams['status'] !== '') {
 $PAGE->set_url($url);
 
 if ($urlparams['action'] == '') {
+    $instance = $DB->get_record('externalassignment', ['id' => $coursemodule->instance], '*', MUST_EXIST);
+    externalassignment_view($instance, $course, $coursemodule->get_course_module_record(), $context);
     mod_externalassignment_show_details($context, $coursemoduleid);
 } else if ($urlparams['action'] == 'grading') {
     mod_externalassignment_show_grading($context, $coursemoduleid, $urlparams['sort'], $urlparams['tdir']);
