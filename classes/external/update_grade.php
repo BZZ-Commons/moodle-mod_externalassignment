@@ -81,6 +81,11 @@ class update_grade extends external_api {
             ]
         );
 
+        // The link is shown to students and graders as a link: accept web addresses only.
+        if ($params['externallink'] !== '' && !preg_match('#^https?://#i', $params['externallink'])) {
+            throw new \invalid_parameter_exception('externallink must be an http:// or https:// URL');
+        }
+
         // Get the userid from the external username.
         $externalusername = self::customfieldid_username();
         $results = [];
@@ -186,7 +191,7 @@ class update_grade extends external_api {
                     'the maximum points'
                 ),
                 'externallink' => new external_value(
-                    PARAM_TEXT,
+                    PARAM_URL,
                     'the url of the student repository',
                     0,
                     ''

@@ -61,7 +61,7 @@ class grader_form extends moodleform {
             'static',
             'externallink_static',
             get_string('externallink', 'externalassignment'),
-            $this->_customdata->externallink
+            s($this->_customdata->externallink)
         );
         $mform->addElement(
             'float',

@@ -82,6 +82,56 @@ final class update_grade_test extends \advanced_testcase {
     }
 
     /**
+     * Regression test for GitHub issue #51: the student's link must be a web address, anything
+     * else (e.g. a javascript: URL) is rejected and nothing is stored.
+     */
+    public function test_execute_rejects_non_http_externallink(): void {
+        global $DB;
+
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        set_config('external_username', 'github_user', 'mod_externalassignment');
+        $field = $DB->get_record('user_info_field', ['shortname' => 'github_user'], '*', MUST_EXIST);
+
+        $course = $this->getDataGenerator()->create_course();
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_externalassignment');
+        $instance = $generator->create_instance(
+            [
+                'course' => $course->id,
+                'externalname' => 'externalname',
+                'externalgrademax' => 100,
+                'cutoffdate' => time() + 3600,
+            ]
+        );
+
+        $user = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user->id, $course->id, 'student');
+        $DB->insert_record('user_info_data', [
+            'userid' => $user->id,
+            'fieldid' => $field->id,
+            'data' => 'octocat-link',
+            'dataformat' => FORMAT_MOODLE,
+        ]);
+
+        foreach (['javascript:alert(1)', 'ftp://example.com/repo', 'not a url'] as $link) {
+            try {
+                update_grade::execute('externalname', 'octocat-link', 45.0, 100.0, $link, '');
+                $this->fail('Expected invalid_parameter_exception for ' . $link);
+            } catch (\invalid_parameter_exception $e) {
+                $this->assertFalse($DB->record_exists('externalassignment_grades', ['userid' => $user->id]));
+            }
+        }
+
+        $result = update_grade::execute('externalname', 'octocat-link', 45.0, 100.0, 'https://example.com/repo', '');
+        $this->assertEquals('info', $result['type']);
+        $this->assertEquals(
+            'https://example.com/repo',
+            $DB->get_field('externalassignment_grades', 'externallink', ['userid' => $user->id])
+        );
+    }
+
+    /**
      * Regression test for GitHub issue #42: a caller without
      * mod/externalassignment:updateexternalgrade (e.g. a student) must not be able to set grades.
      */

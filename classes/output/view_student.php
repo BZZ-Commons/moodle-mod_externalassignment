@@ -86,7 +86,9 @@ class view_student implements renderable, templatable {
      */
     public function export_for_template(renderer_base $output): \stdClass {
         $data = new \stdClass();
-        $data->studentlink = $this->grade->get_externallink();
+        // Only web addresses are linked, whatever an older version stored (e.g. a javascript: URL).
+        $studentlink = $this->grade->get_externallink();
+        $data->studentlink = preg_match('#^https?://#i', $studentlink) ? $studentlink : '';
         $data->externallink = $this->assignment->get_externallink();
         $allowsubmissionsfromdate = $this->assignment->get_allowsubmissionsfromdate();
         $data->showexternallink = $this->assignment->is_alwaysshowlink() ||
