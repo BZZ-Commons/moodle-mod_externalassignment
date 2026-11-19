@@ -91,8 +91,10 @@ class update_grade extends external_api {
         $results = [];
         $users = explode(',', $params['user_name']);
 
+        $userids = self::get_user_ids($users, $externalusername);
+
         foreach ($users as $user) {
-            $userid = self::get_user_id($user, $externalusername);
+            $userid = $userids[$user] ?? null;
 
             if (empty($userid)) {
                 $results = self::generate_warning(
@@ -221,30 +223,38 @@ class update_grade extends external_api {
     }
 
     /**
-     * returns the moodle userid by the external username
-     * @param string $username the external username
+     * returns the moodle userids for external usernames, with one query for all of them
+     * @param string[] $usernames the external usernames
      * @param int $fieldid the id of the custom field for external username
-     * @return int  the moodle-userid
+     * @return int[] the moodle userids, keyed by the external username as given
      * @throws dml_exception
      */
-    private static function get_user_id(string $username, int $fieldid): ?int {
+    private static function get_user_ids(array $usernames, int $fieldid): array {
         global $DB;
-        $query = 'SELECT userid' .
-            '  FROM {user_info_data}' .
-            ' WHERE fieldid=:fieldid' .
-            '   AND data=:ghusername';
-        $user = $DB->get_record_sql(
-            $query,
-            [
-                'fieldid' => $fieldid,
-                'ghusername' => $username,
-            ]
-        );
-        if (!empty($user)) {
-            return $user->userid;
-        } else {
-            return null;
+        if (empty($usernames)) {
+            return [];
         }
+        [$insql, $inparams] = $DB->get_in_or_equal($usernames, SQL_PARAMS_NAMED, 'ghuser');
+        $records = $DB->get_records_sql(
+            'SELECT id, userid, data' .
+            '  FROM {user_info_data}' .
+            ' WHERE fieldid = :fieldid' .
+            "   AND data $insql" .
+            ' ORDER BY id',
+            ['fieldid' => $fieldid] + $inparams
+        );
+        $result = [];
+        foreach ($records as $record) {
+            // The database may match case-insensitively, so the username is matched without regard to case.
+            $result[$record->data] ??= (int)$record->userid;
+            $result[\core_text::strtolower($record->data)] ??= (int)$record->userid;
+        }
+        // Return the id for every username that was asked for.
+        $found = [];
+        foreach ($usernames as $username) {
+            $found[$username] = $result[$username] ?? $result[\core_text::strtolower($username)] ?? null;
+        }
+        return array_filter($found, fn($userid) => $userid !== null);
     }
 
     /**

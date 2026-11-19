@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
-namespace mod_externalassignment\local;
+namespace mod_externalassignment\external;
 
 use mod_externalassignment\external\update_grade;
 use PHPUnit\Framework\Attributes\CoversMethod;
@@ -459,5 +459,50 @@ final class update_grade_test extends \advanced_testcase {
             $completion->get_data($cm, false, $student->id)->completionstate,
             'Automatic completion must still be recomputed and reflect the passing grade.'
         );
+    }
+
+    /**
+     * Several external usernames in one call are resolved together (one query for all of them),
+     * and every user who is found is graded.
+     */
+    public function test_execute_with_several_users(): void {
+        global $DB;
+
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        set_config('external_username', 'github_user', 'mod_externalassignment');
+        $field = $DB->get_record('user_info_field', ['shortname' => 'github_user'], '*', MUST_EXIST);
+
+        $course = $this->getDataGenerator()->create_course();
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_externalassignment');
+        $instance = $generator->create_instance(
+            ['course' => $course->id, 'externalname' => 'externalname', 'externalgrademax' => 100]
+        );
+
+        $userids = [];
+        foreach (['octocat-a', 'octocat-b'] as $username) {
+            $user = $this->getDataGenerator()->create_user();
+            $this->getDataGenerator()->enrol_user($user->id, $course->id, 'student');
+            $DB->insert_record('user_info_data', [
+                'userid' => $user->id,
+                'fieldid' => $field->id,
+                'data' => $username,
+                'dataformat' => FORMAT_MOODLE,
+            ]);
+            $userids[$username] = $user->id;
+        }
+
+        update_grade::execute('externalname', 'octocat-a,octocat-b', 30.0, 100.0, 'https://example.com/repo', '');
+
+        foreach ($userids as $userid) {
+            $grade = $DB->get_record(
+                'externalassignment_grades',
+                ['externalassignment' => $instance->id, 'userid' => $userid],
+                '*',
+                MUST_EXIST
+            );
+            $this->assertEqualsWithDelta(30.0, (float)$grade->externalgrade, 0.001);
+        }
     }
 }

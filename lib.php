@@ -349,15 +349,36 @@ function externalassignment_refresh_events($courseid = 0, $instance = null, $cm 
         }
     }
 
-    foreach ($instances as $externalassignment) {
-        $module = get_coursemodule_from_instance(
-            'externalassignment',
-            $externalassignment->id,
-            $externalassignment->course,
-            false,
-            MUST_EXIST
+    // Load the course modules and the overrides of all instances at once, not once per instance.
+    $coursemoduleids = [];
+    $overrides = [];
+    foreach (array_chunk(array_keys($instances), 1000) as $instanceids) {
+        [$insql, $inparams] = $DB->get_in_or_equal($instanceids, SQL_PARAMS_NAMED);
+        $modules = $DB->get_records_sql(
+            "SELECT cm.instance, cm.id
+               FROM {course_modules} cm
+               JOIN {modules} m ON m.id = cm.module AND m.name = :modname
+              WHERE cm.instance $insql",
+            ['modname' => 'externalassignment'] + $inparams
         );
-        externalassignment_refresh_instance_events($externalassignment, $module->id);
+        foreach ($modules as $module) {
+            $coursemoduleids[$module->instance] = (int)$module->id;
+        }
+        foreach ($DB->get_records_list('externalassignment_overrides', 'externalassignment', $instanceids) as $override) {
+            $overrides[$override->externalassignment][] = $override;
+        }
+    }
+
+    foreach ($instances as $externalassignment) {
+        if (!isset($coursemoduleids[$externalassignment->id])) {
+            // An instance without a course module has no events to refresh.
+            continue;
+        }
+        externalassignment_refresh_instance_events(
+            $externalassignment,
+            $coursemoduleids[$externalassignment->id],
+            $overrides[$externalassignment->id] ?? []
+        );
     }
     return true;
 }
@@ -368,14 +389,21 @@ function externalassignment_refresh_events($courseid = 0, $instance = null, $cm 
  *
  * @param \stdClass $instance the externalassignment record
  * @param int $coursemoduleid the id of the course module
+ * @param array|null $overrides the override records of the instance, loaded from the database when omitted
  * @return void
  */
-function externalassignment_refresh_instance_events(\stdClass $instance, int $coursemoduleid): void {
+function externalassignment_refresh_instance_events(
+    \stdClass $instance,
+    int $coursemoduleid,
+    ?array $overrides = null
+): void {
     global $DB;
 
     assign_control::update_calendar_event($instance, $instance->course, $coursemoduleid);
 
-    $overrides = $DB->get_records('externalassignment_overrides', ['externalassignment' => $instance->id]);
+    if ($overrides === null) {
+        $overrides = $DB->get_records('externalassignment_overrides', ['externalassignment' => $instance->id]);
+    }
     foreach ($overrides as $override) {
         assign_control::update_override_calendar_event(
             $instance,

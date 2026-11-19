@@ -240,7 +240,7 @@ final class lib_test extends \advanced_testcase {
      * the adhoc task instead.
      */
     public function test_duplicating_activity_creates_calendar_event_for_the_copy(): void {
-        global $DB;
+        global $CFG, $DB;
 
         $this->resetAfterTest(true);
         $this->setAdminUser();
@@ -257,7 +257,14 @@ final class lib_test extends \advanced_testcase {
 
         $cm = get_coursemodule_from_instance('externalassignment', $instance->id, $course->id, false, MUST_EXIST);
 
-        $newcm = \core_courseformat\formatactions::cm($course->id)->duplicate($cm->id);
+        // Moodle 5.1 moved duplicating to the course format actions, older versions only have duplicate_module().
+        $cmactions = \core_courseformat\formatactions::cm($course->id);
+        if (method_exists($cmactions, 'duplicate')) {
+            $newcm = $cmactions->duplicate($cm->id);
+        } else {
+            require_once($CFG->dirroot . '/course/lib.php');
+            $newcm = duplicate_module($course, get_fast_modinfo($course)->get_cm($cm->id));
+        }
         $this->assertNotNull($newcm, 'Duplicating the activity must succeed.');
 
         $newinstance = $DB->get_record('externalassignment', ['id' => $newcm->instance], '*', MUST_EXIST);

@@ -406,10 +406,22 @@ class assign {
             'externalassignment_overrides',
             $conditions
         );
+        // Users with an override who are not (or no longer) students are loaded with one query.
+        $missing = [];
+        foreach ($data as $record) {
+            if (!array_key_exists($record->userid, $this->students) || $this->students[$record->userid] == null) {
+                $missing[] = $record->userid;
+            }
+        }
+        $users = empty($missing) ? [] : $DB->get_records_list('user', 'id', array_unique($missing));
         foreach ($data as $record) {
             $override = new override($record);
             if (!array_key_exists($record->userid, $this->students) || $this->students[$record->userid] == null) {
-                $this->students[$record->userid] = new student($this, $DB->get_record('user', ['id' => $record->userid]));
+                if (!isset($users[$record->userid])) {
+                    // The user does not exist (any more).
+                    continue;
+                }
+                $this->students[$record->userid] = new student($this, $users[$record->userid]);
             }
             $this->students[$record->userid]->set_override($override);
         }

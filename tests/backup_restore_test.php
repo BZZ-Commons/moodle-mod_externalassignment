@@ -161,7 +161,15 @@ final class backup_restore_test extends \advanced_testcase {
             $this->assertSame('externalassignment', (new \ReflectionProperty($rule, 'module'))->getValue($rule));
         }
 
-        $courserules = \restore_externalassignment_activity_task::define_restore_log_rules_for_course();
+        // Moodle's restore_log_rule passes the "unmodified" null info to preg_match_all(), which is
+        // deprecated since PHP 8.1. Core's own modules define their course rules the same way, so
+        // the deprecation is not caused by this plugin and must not fail the test (nor the CI run).
+        set_error_handler(static fn() => true, E_DEPRECATED);
+        try {
+            $courserules = \restore_externalassignment_activity_task::define_restore_log_rules_for_course();
+        } finally {
+            restore_error_handler();
+        }
         $this->assertCount(2, $courserules);
         foreach ($courserules as $rule) {
             $this->assertInstanceOf(\restore_log_rule::class, $rule);
@@ -374,7 +382,7 @@ final class backup_restore_test extends \advanced_testcase {
      * renames the copy, so that the external names stay unique within a course.
      */
     public function test_duplicate_external_name_is_replaced_on_restore(): void {
-        global $DB;
+        global $CFG, $DB;
         $this->resetAfterTest(true);
         $this->setAdminUser();
 
@@ -382,7 +390,14 @@ final class backup_restore_test extends \advanced_testcase {
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_externalassignment');
         $instance = $generator->create_instance(['course' => $course->id, 'externalname' => 'm123-unique']);
 
-        \core_courseformat\formatactions::cm($course->id)->duplicate($instance->cmid);
+        // Moodle 5.1 moved duplicating to the course format actions, older versions only have duplicate_module().
+        $cmactions = \core_courseformat\formatactions::cm($course->id);
+        if (method_exists($cmactions, 'duplicate')) {
+            $cmactions->duplicate($instance->cmid);
+        } else {
+            require_once($CFG->dirroot . '/course/lib.php');
+            duplicate_module($course, get_fast_modinfo($course)->get_cm($instance->cmid));
+        }
 
         $names = $DB->get_fieldset_select('externalassignment', 'externalname', 'course = ?', [$course->id]);
         $this->assertCount(2, $names);

@@ -21,6 +21,9 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/mod/externalassignment/lib.php');
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+
 /**
  * Tests for the view events of mod_externalassignment.
  *
@@ -29,9 +32,10 @@ require_once($CFG->dirroot . '/mod/externalassignment/lib.php');
  * @author    2026 Marcel Suter <marcel.suter+ea@bzz.ch>
  * @author    2026 Kevin Maurizi <kevin.maurizi@bzz.ch>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers \mod_externalassignment\event\course_module_viewed
- * @covers \mod_externalassignment\event\course_module_instance_list_viewed
  */
+#[Group('mod_externalassignment')]
+#[CoversClass(course_module_viewed::class)]
+#[CoversClass(course_module_instance_list_viewed::class)]
 final class events_test extends \advanced_testcase {
     /**
      * The course module viewed event carries the right data.

@@ -377,4 +377,44 @@ final class grade_control_test extends \advanced_testcase {
             $gradecontrol->filter_student_userids([$student->id, $outsider->id, 999999])
         );
     }
+
+    /**
+     * When the ids of the existing overrides are passed in (as the override form does, to avoid
+     * one query per student), the existing override is updated in place and none is added.
+     */
+    public function test_override_update_with_preloaded_existing_overrides(): void {
+        global $DB;
+
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+
+        $course = $this->getDataGenerator()->create_course();
+        $student = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($student->id, $course->id, 'student');
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_externalassignment');
+        $instance = $generator->create_instance(['course' => $course->id, 'duedate' => time() + DAYSECS]);
+        $module = get_coursemodule_from_instance('externalassignment', $instance->id);
+        $gradecontrol = new grade_control($module->id, \context_module::instance($module->id), $student->id);
+
+        $newduedate = time() + 3 * DAYSECS;
+        $id = $DB->insert_record('externalassignment_overrides', (object) [
+            'externalassignment' => $instance->id,
+            'userid' => $student->id,
+            'allowsubmissionsfromdate' => 0,
+            'duedate' => time() + 2 * DAYSECS,
+            'cutoffdate' => 0,
+        ]);
+        $existing = $DB->get_records('externalassignment_overrides', ['externalassignment' => $instance->id], '', 'userid, id');
+
+        $override = new override();
+        $override->set_externalassignment($instance->id);
+        $override->set_userid($student->id);
+        $override->set_allowfromdate(0);
+        $override->set_duedate($newduedate);
+        $override->set_cutoffdate(0);
+        $gradecontrol->override_update($override, $existing);
+
+        $this->assertEquals(1, $DB->count_records('externalassignment_overrides', ['externalassignment' => $instance->id]));
+        $this->assertEquals($newduedate, $DB->get_field('externalassignment_overrides', 'duedate', ['id' => $id]));
+    }
 }

@@ -363,6 +363,53 @@ final class assign_test extends \advanced_testcase {
     }
 
     /**
+     * Users who have an override but are not in the student list are loaded together with their
+     * override; an override of a user that does not exist (any more) is ignored.
+     */
+    public function test_load_overrides_for_users_outside_the_student_list(): void {
+        global $DB;
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+        $course = $this->getDataGenerator()->create_course();
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_externalassignment');
+        $instance = $generator->create_instance(['course' => $course->id]);
+        $cm = get_coursemodule_from_instance('externalassignment', $instance->id);
+        $assign = new assign(null, \context_module::instance($cm->id));
+        $assign->set_students([]);
+
+        $users = [
+            $this->getDataGenerator()->create_user(['firstname' => 'John', 'lastname' => 'Doe']),
+            $this->getDataGenerator()->create_user(['firstname' => 'Jane', 'lastname' => 'Smith']),
+        ];
+        foreach ($users as $user) {
+            $generator->create_override_entry([
+                'externalassignment' => $instance->cmid,
+                'userid' => $user->id,
+                'allowsubmissionsfromdate' => 0,
+                'duedate' => time() + 3600,
+                'cutoffdate' => 0,
+            ]);
+        }
+        $DB->insert_record('externalassignment_overrides', (object) [
+            'externalassignment' => $instance->cmid,
+            'userid' => 987654,
+            'allowsubmissionsfromdate' => 0,
+            'duedate' => time() + 3600,
+            'cutoffdate' => 0,
+        ]);
+
+        $method = new \ReflectionMethod($assign, 'load_overrides');
+        $method->invoke($assign, $instance->cmid, null);
+
+        $students = $assign->get_students();
+        $this->assertCount(2, $students);
+        foreach ($users as $user) {
+            $this->assertNotNull($students[$user->id]->get_override());
+            $this->assertEquals($user->lastname, $students[$user->id]->get_lastname());
+        }
+    }
+
+    /**
      * Test the setters and getters
      * @throws \coding_exception
      * @throws \dml_exception

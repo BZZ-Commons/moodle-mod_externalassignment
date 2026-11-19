@@ -1,22 +1,28 @@
-# Builds the installable plugin ZIP and publishes it as a GitHub release on every push to main.
+# Builds the installable plugin ZIP and publishes it as a GitHub release once the ci workflow has
+# succeeded for a push to main.
 # Moodle's plugin installer needs a single root folder named after the plugin ("externalassignment"),
 # which GitHub's own "Download ZIP" does not provide (GitHub issue #46).
 name: Release
 
 on:
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows: [ci]
+    types: [completed]
+    branches: [main]
 
 permissions:
   contents: write
 
 jobs:
   release:
+    # Only releases code that passed all the checks of the ci workflow.
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' }}
     runs-on: ubuntu-latest
     steps:
-      - name: Check out the code
+      - name: Check out the code that was tested
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
 
       - name: Read the plugin version
         id: plugin
@@ -47,6 +53,7 @@ jobs:
       - name: Publish the release
         env:
           GH_TOKEN: ${{ github.token }}
+          SHA: ${{ github.event.workflow_run.head_sha }}
           TAG: ${{ steps.plugin.outputs.tag }}
           ZIP: ${{ steps.plugin.outputs.zip }}
         run: |
@@ -55,7 +62,7 @@ jobs:
             gh release upload "$TAG" "$ZIP" --clobber
           else
             gh release create "$TAG" "$ZIP" \
-              --target "$GITHUB_SHA" \
+              --target "$SHA" \
               --title "Version ${{ steps.plugin.outputs.release }} (${{ steps.plugin.outputs.version }})" \
               --generate-notes
           fi

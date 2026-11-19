@@ -295,6 +295,14 @@ class grade_control {
             debugging('Cancelled');  // FIXME reset the form.
         } else {
             if ($formdata = $mform->get_data()) {
+                global $DB;
+                // The existing overrides are loaded once, not once per student.
+                $existing = $DB->get_records(
+                    'externalassignment_overrides',
+                    ['externalassignment' => $this->get_assign()->get_id()],
+                    '',
+                    'userid, id'
+                );
                 foreach ($this->filter_student_userids($formdata->uid) as $userid) {
                     $override = new override();
                     $override->set_externalassignment($this->get_assign()->get_id());
@@ -302,7 +310,7 @@ class grade_control {
                     $override->set_allowfromdate($formdata->allowsubmissionsfromdate);
                     $override->set_duedate($formdata->duedate);
                     $override->set_cutoffdate($formdata->cutoffdate);
-                    $this->override_update($override);
+                    $this->override_update($override, $existing);
                 }
                 $url = new \moodle_url(
                     '/mod/externalassignment/view.php',
@@ -325,23 +333,28 @@ class grade_control {
      * their Dashboard would keep marking the assignment "Overdue" using the original due date
      * even after being granted an extension (GitHub issue #37).
      * @param override $override
+     * @param array|null $existing the ids of the existing overrides of this assignment, keyed by user id,
+     *                             looked up in the database when omitted
      * @return void
      * @throws \dml_exception
      * @throws \coding_exception
      * @throws \moodle_exception
      */
-    public function override_update(override $override): void {
+    public function override_update(override $override, ?array $existing = null): void {
         global $DB;
-        if (
-            $record = $DB->get_record(
+        if ($existing === null) {
+            $existing = $DB->get_records(
                 'externalassignment_overrides',
                 [
-                'externalassignment' => $override->get_externalassignment(),
-                'userid' => $override->get_userid(),
-                ]
-            )
-        ) {
-            $override->set_id($record->id);
+                    'externalassignment' => $override->get_externalassignment(),
+                    'userid' => $override->get_userid(),
+                ],
+                '',
+                'userid, id'
+            );
+        }
+        if (isset($existing[$override->get_userid()])) {
+            $override->set_id($existing[$override->get_userid()]->id);
             $DB->update_record('externalassignment_overrides', $override->to_stdclass());
         } else {
             $DB->insert_record('externalassignment_overrides', $override->to_stdclass());
