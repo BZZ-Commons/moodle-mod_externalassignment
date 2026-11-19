@@ -80,7 +80,9 @@ class read_students extends external_api {
         );
         $context = context_module::instance($params['coursemoduleid']);
         self::validate_context($context);
-        require_capability('mod/externalassignment:reviewgrades', $context);
+        if (!has_capability('mod/externalassignment:viewgrades', $context)) {
+            throw new required_capability_exception($context, 'mod/externalassignment:viewgrades', 'nopermissions', '');
+        }
 
         $assign = new assign(null, $context);
         $assign->load_db($params['coursemoduleid'], $params['sort'], $params['tdir']);

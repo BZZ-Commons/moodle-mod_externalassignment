@@ -211,7 +211,7 @@ function externalassignment_extend_settings_navigation(settings_navigation $sett
     }
 
     $context = $cm->context;
-    if (has_capability('mod/externalassignment:reviewgrades', $context)) {
+    if (has_capability('mod/externalassignment:viewgrades', $context)) {
         $url = new moodle_url('/mod/externalassignment/view.php', ['id' => $settings->get_page()->cm->id, 'action' => 'grading']);
         $navref->add(
             text: get_string('gradeitem:submissions', 'assign'),

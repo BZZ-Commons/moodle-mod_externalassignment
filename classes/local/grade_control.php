@@ -133,6 +133,7 @@ class grade_control {
      */
     public function process_feedback(): void {
         global $CFG;
+        require_capability('mod/externalassignment:grade', $this->get_context());
         $student = $this->get_assign()->take_student($this->get_userid());
         $data = new \stdClass();
 
@@ -273,6 +274,7 @@ class grade_control {
      * @codeCoverageIgnore
      */
     public function process_override(array $userids): void {
+        require_capability('mod/externalassignment:grantextension', $this->get_context());
         $data = new \stdClass();
         $data->id = $this->coursemoduleid;
         $data->externalassignment = $this->get_assign()->get_id();

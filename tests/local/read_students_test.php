@@ -35,7 +35,7 @@ use required_capability_exception;
 #[CoversMethod(read_students::class, 'execute')]
 final class read_students_test extends \advanced_testcase {
     /**
-     * Creates a course, an externalassignment instance and a teacher who may review grades.
+     * Creates a course, an externalassignment instance and a teacher who may view grades.
      * @return array [course, instance, teacher]
      */
     private function setup_assignment(): array {
@@ -133,7 +133,7 @@ final class read_students_test extends \advanced_testcase {
     }
 
     /**
-     * Test that a user without the reviewgrades capability cannot call this function
+     * Test that a user without the viewgrades capability cannot call this function
      */
     public function test_execute_requires_capability(): void {
         $this->resetAfterTest(true);

@@ -258,7 +258,6 @@ final class view_student_test extends \advanced_testcase {
         $teacher = $this->getDataGenerator()->create_user();
         $this->getDataGenerator()->enrol_user($teacher->id, $course->id, 'teacher');
         $context = \context_module::instance($instance->cmid);
-        $this->assertFalse(has_capability('mod/externalassignment:reviewgrades', $context, $teacher));
 
         $assign = new assign(null, $context);
         $assign->load_db($instance->cmid);

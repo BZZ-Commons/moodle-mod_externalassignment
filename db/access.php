@@ -55,6 +55,7 @@ $capabilities = [
             'student' => CAP_ALLOW,
         ],
     ],
+    // View the grades of all students (read only), e.g. for non-editing teachers.
     'mod/externalassignment:viewgrades' => [
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
@@ -64,36 +65,17 @@ $capabilities = [
             'teacher' => CAP_ALLOW,
         ],
     ],
+    // Enter and change grades and feedback.
     'mod/externalassignment:grade' => [
         'riskbitmask' => RISK_XSS,
-
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => [
-            'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
             'manager' => CAP_ALLOW,
         ],
     ],
 
-    'mod/externalassignment:managegrades' => [
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_MODULE,
-        'archetypes' => [
-            'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW,
-        ],
-        'clonepermissionsfrom' => 'moodle/grade:manage',
-    ],
-    'mod/externalassignment:reviewgrades' => [
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_MODULE,
-        'archetypes' => [
-            'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW,
-        ],
-        'clonepermissionsfrom' => 'moodle/grade:manage',
-    ],
     'mod/externalassignment:updateexternalgrade' => [
         'riskbitmask' => RISK_PERSONAL,
         'captype' => 'write',
@@ -103,11 +85,11 @@ $capabilities = [
             'manager' => CAP_ALLOW,
         ],
     ],
+    // Grant extensions (overrides of the dates) to individual students.
     'mod/externalassignment:grantextension' => [
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => [
-            'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
             'manager' => CAP_ALLOW,
         ],

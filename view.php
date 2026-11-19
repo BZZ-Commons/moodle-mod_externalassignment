@@ -135,7 +135,7 @@ function mod_externalassignment_show_details($context, $coursemoduleid): void {
         echo $output->render($renderable);
     }
 
-    if (has_capability('mod/externalassignment:reviewgrades', $context)) {
+    if (has_capability('mod/externalassignment:viewgrades', $context)) {
         $renderable = new view_summary($coursemoduleid, $context);
         echo $output->render($renderable);
     } else {
@@ -165,7 +165,9 @@ function mod_externalassignment_show_grading(
     string $tdir
 ): void {
     global $PAGE;
-    require_capability('mod/externalassignment:reviewgrades', $context);
+    if (!has_capability('mod/externalassignment:viewgrades', $context)) {
+        throw new \required_capability_exception($context, 'mod/externalassignment:viewgrades', 'nopermissions', '');
+    }
 
     $courseshortname = $context->get_course_context()->get_context_name(false, true);
     $assignmentname = $context->get_context_name(false, true);
@@ -200,7 +202,7 @@ function mod_externalassignment_show_grading(
  */
 function mod_externalassignment_show_grader($context, $coursemoduleid, $userid, string $sort, string $tdir, string $status): void {
     global $PAGE;
-    require_capability('mod/externalassignment:reviewgrades', $context);
+    require_capability('mod/externalassignment:grade', $context);
 
     if (empty($userid)) {
         $assign = new assign(null, $context);
@@ -254,7 +256,7 @@ function mod_externalassignment_show_override($context, int $coursemoduleid, arr
     global $CFG;
     global $PAGE;
 
-    require_capability('mod/externalassignment:reviewgrades', $context);
+    require_capability('mod/externalassignment:grantextension', $context);
     $courseshortname = $context->get_course_context()->get_context_name(false, true);
     $assignmentname = $context->get_context_name(false, true);
     $title = $courseshortname . ': ' . $assignmentname . ' - ' . get_string('override', 'externalassignment');

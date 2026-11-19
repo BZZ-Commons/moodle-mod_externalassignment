@@ -79,6 +79,8 @@ class view_grading implements renderable, templatable {
         $data->url = $PAGE->url;
         $data->sort = $this->sort;
         $data->tdir = $this->tdir;
+        $data->cangrade = has_capability('mod/externalassignment:grade', $this->context);
+        $data->canextend = has_capability('mod/externalassignment:grantextension', $this->context);
         $list = [];
         foreach ($students as $student) {
             $gradedata = $student->to_stdclass();

@@ -36,7 +36,7 @@ require_login($course, false, $coursemodule);
 $modulecontext = context_module::instance($coursemodule->id);
 
 // Re-direct the user.
-if (has_capability('mod/externalassignment:reviewgrades', $modulecontext)) {
+if (has_capability('mod/externalassignment:viewgrades', $modulecontext)) {
     $url = new moodle_url('view.php', ['id' => $id, 'action' => 'grading']);
 } else {
     $url = new moodle_url('view.php', ['id' => $id]);

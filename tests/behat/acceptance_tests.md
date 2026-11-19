@@ -157,6 +157,8 @@ GitHub issues:
 | [`teacher_grader_submit_and_next.feature`](teacher_grader_submit_and_next.feature) | Grader form "Save and show next" saves the grade and opens the next student; button hidden for the last student | #6 |
 | [`teacher_submissions_tab_highlight.feature`](teacher_submissions_tab_highlight.feature) | "Submissions" secondary-navigation tab is highlighted on the submissions overview and the grader form | #40 |
 | [`teacher_grading_pages_layout.feature`](teacher_grading_pages_layout.feature) | Submissions overview and grader form use the `incourse` layout so core can show the previous/next activity links | #41 |
+| [`student_cannot_see_other_grades.feature`](student_cannot_see_other_grades.feature) | A student sees the own grade only and gets no link to the grading pages | #52 |
+| [`teacher_roles_permissions.feature`](teacher_roles_permissions.feature) | Non-editing teachers see all grades read-only (no Grade link, no extension controls); editing teachers may grade and grant extensions | #52 |
 
 
 

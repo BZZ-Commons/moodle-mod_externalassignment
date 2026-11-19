@@ -26,7 +26,7 @@
     * none
 
     Context variables required for this template:
-    * userid, courseid, firstname, lastname, status, externalgrade, manualgrade, coursemoduleid, feedback, gradefinal
+    * cangrade, canextend, userid, courseid, firstname, lastname, status, externalgrade, manualgrade, coursemoduleid, feedback, gradefinal
 
     Example context (json):
     {
@@ -36,10 +36,12 @@
   <table class="flexible table table-striped table-hover generaltable generalbox">
     <thead>
     <tr>
+      {{#canextend}}
       <th class="header c1" scope="col">
         {{#str}} select {{/str}} <br>
         <input id="selectAll" type="checkbox">
       </th>
+      {{/canextend}}
       <th class="header c2" scope="col">
         <a id="sortFirstname" href=".">
           {{#str}} firstname, core {{/str}}
@@ -73,9 +75,11 @@
     <tbody>
     {{#students}}
       <tr>
+        {{#canextend}}
         <td>
           <input type="checkbox" name="selectbox" data-userid="{{userid}}"/>
         </td>
+        {{/canextend}}
         <td>
           <a href="{{ config.wwwroot }}/user/view.php?id={{ userid }}&course={{ courseid }}">
           {{ firstname }} {{ lastname }}
@@ -83,10 +87,12 @@
         </td>
         <td>{{ status }}</td>
         <td>
+          {{#cangrade}}
           <a href="{{ config.wwwroot }}/mod/externalassignment/view.php?action=grader&id={{ coursemoduleid }}&userid={{ userid }}&sort={{ sort }}&tdir={{ tdir }}"
           class="btn btn-primary">
           {{#str}} grade, mod_externalassignment {{/str}}
           </a>
+          {{/cangrade}}
         </td>
         <td>{{ externalgrade }}</td>
         <td>{{ manualgrade }}</td>
@@ -96,6 +102,7 @@
     </tbody>
   </table>
 </div>
+{{#canextend}}
 <div id="fgroup_id_actionsgrp" class="form-group row fitem" data-groupname="actionsgrp">
   <div class="col-md-9 form-inline align-items-start felement" data-fieldtype="group">
     <fieldset class="w-100 m-0 p-0 border-0">
@@ -122,9 +129,12 @@
     </div>
   </div>
 </div>
+{{/canextend}}
 {{^element.frozen}}
   {{#js}}
+    {{#canextend}}
     require(['mod_externalassignment/grading_actions'], (module) => module.init());
+    {{/canextend}}
     require(['mod_externalassignment/grading_sort'], (module) => module.init());
   {{/js}}
 {{/element.frozen}}
