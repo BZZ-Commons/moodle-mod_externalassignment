@@ -29,8 +29,8 @@ Feature: The "Submissions" tab is highlighted on the submissions overview
     Given I am logged in as "teacher1"
     And I am on the "Highlight test" "externalassignment activity" page
     When I click on "Submissions" "link" in the ".secondary-navigation" "css_element"
-    Then I should see "Submissions" in the ".secondary-navigation .nav-link.active" "css_element"
-    And I should not see "Highlight test" in the ".secondary-navigation .nav-link.active" "css_element"
+    Then I should see "Submissions" in the ".secondary-navigation .nav-link.active, .secondary-navigation .mds-nav-pill--selected" "css_element"
+    And I should not see "Highlight test" in the ".secondary-navigation .nav-link.active, .secondary-navigation .mds-nav-pill--selected" "css_element"
 
   @javascript
   Scenario: The Submissions tab stays active on the grader form
@@ -38,4 +38,4 @@ Feature: The "Submissions" tab is highlighted on the submissions overview
     And I am on the "Highlight test" "externalassignment activity" page
     And I click on "Submissions" "link" in the ".secondary-navigation" "css_element"
     When I click on "Grade" "link" in the "Student 1" "table_row"
-    Then I should see "Submissions" in the ".secondary-navigation .nav-link.active" "css_element"
+    Then I should see "Submissions" in the ".secondary-navigation .nav-link.active, .secondary-navigation .mds-nav-pill--selected" "css_element"
