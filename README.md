@@ -4,6 +4,8 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 
 # External Assignment for Moodle
 
+[![ci](https://github.com/BZZ-Commons/moodle-mod_externalassignment/actions/workflows/ci.yml/badge.svg)](https://github.com/BZZ-Commons/moodle-mod_externalassignment/actions/workflows/ci.yml)
+
 This module creates an assignment in Moodle where the student's grades can be updated with the results of an assignment in an external system (e.g. GitHub Classroom). As well as the grade and feedback from the external system, there are separate fields for manual grading and feedback.
 
 We have developed this module to integrate automatic grading from GitHub Classroom into Moodle.
