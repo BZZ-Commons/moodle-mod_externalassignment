@@ -1,0 +1,6 @@
+# Files that are left out of the release ZIP built with "git archive" (GitHub issue #46).
+/.github export-ignore
+/.gitattributes export-ignore
+/.gitignore export-ignore
+/.idea export-ignore
+/tests/behat/acceptance_tests.md export-ignore

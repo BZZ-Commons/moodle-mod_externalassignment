@@ -1,0 +1,61 @@
+# Builds the installable plugin ZIP and publishes it as a GitHub release on every push to main.
+# Moodle's plugin installer needs a single root folder named after the plugin ("externalassignment"),
+# which GitHub's own "Download ZIP" does not provide (GitHub issue #46).
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v4
+
+      - name: Read the plugin version
+        id: plugin
+        run: |
+          release=$(sed -n "s/^\$plugin->release *= *'\([^']*\)'.*/\1/p" version.php)
+          version=$(sed -n 's/^\$plugin->version *= *\([0-9.]*\);.*/\1/p' version.php)
+          if [ -z "$release" ] || [ -z "$version" ]; then
+            echo "Could not read release and version from version.php" >&2
+            exit 1
+          fi
+          echo "release=$release" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=v$release-$version" >> "$GITHUB_OUTPUT"
+          echo "zip=mod_externalassignment_$release.zip" >> "$GITHUB_OUTPUT"
+
+      - name: Build the ZIP with the root folder "externalassignment"
+        run: git archive --format=zip --prefix=externalassignment/ -o "${{ steps.plugin.outputs.zip }}" HEAD
+
+      - name: Check the ZIP structure
+        run: |
+          roots=$(unzip -Z1 "${{ steps.plugin.outputs.zip }}" | cut -d/ -f1 | sort -u)
+          if [ "$roots" != "externalassignment" ]; then
+            echo "Unexpected root folder(s) in the ZIP: $roots" >&2
+            exit 1
+          fi
+          unzip -Z1 "${{ steps.plugin.outputs.zip }}" | grep -qx 'externalassignment/version.php'
+
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.plugin.outputs.tag }}
+          ZIP: ${{ steps.plugin.outputs.zip }}
+        run: |
+          # A push without a version bump replaces the ZIP of the existing release.
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$ZIP" --clobber
+          else
+            gh release create "$TAG" "$ZIP" \
+              --target "$GITHUB_SHA" \
+              --title "Version ${{ steps.plugin.outputs.release }} (${{ steps.plugin.outputs.version }})" \
+              --generate-notes
+          fi
