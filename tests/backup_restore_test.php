@@ -374,7 +374,7 @@ final class backup_restore_test extends \advanced_testcase {
      * renames the copy, so that the external names stay unique within a course.
      */
     public function test_duplicate_external_name_is_replaced_on_restore(): void {
-        global $DB;
+        global $CFG, $DB;
         $this->resetAfterTest(true);
         $this->setAdminUser();
 
@@ -382,7 +382,14 @@ final class backup_restore_test extends \advanced_testcase {
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_externalassignment');
         $instance = $generator->create_instance(['course' => $course->id, 'externalname' => 'm123-unique']);
 
-        \core_courseformat\formatactions::cm($course->id)->duplicate($instance->cmid);
+        // Moodle 5.1 moved duplicating to the course format actions, older versions only have duplicate_module().
+        $cmactions = \core_courseformat\formatactions::cm($course->id);
+        if (method_exists($cmactions, 'duplicate')) {
+            $cmactions->duplicate($instance->cmid);
+        } else {
+            require_once($CFG->dirroot . '/course/lib.php');
+            duplicate_module($course, get_fast_modinfo($course)->get_cm($instance->cmid));
+        }
 
         $names = $DB->get_fieldset_select('externalassignment', 'externalname', 'course = ?', [$course->id]);
         $this->assertCount(2, $names);
